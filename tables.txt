@@ -1,0 +1,97 @@
+create table if not exists employee(
+  emp_id varchar(5) primary key not null,
+  emp_name varchar(10) not null, 
+  machine_id varchar(30) not null,
+  machinename tinytext not null,
+  salary integer not null
+);
+
+CREATE TABLE IF NOT EXISTS MachineInventory(
+  MachineId          VARCHAR(5) PRIMARY KEY,
+  MachineName        TINYTEXT NOT NULL,
+  Manufacturer       TINYTEXT NOT NULL,
+  MachineDescription TEXT NOT NULL,
+  AmountAvailable    INTEGER NOT NULL
+  foreign key(machineid) references employee(machine_id);
+);
+
+
+create table Comp_Inventory(c_no int,c_name varchar(30),no_inventory int,no_ordered int,factory_name varchar(20));
+
+
+create table emp_info(emp_id varchar(5) primary key not null, emp_name varchar(10) not null,  machine_id varchar(30) not null, machinename tinytext not null, salary integer not null , FOREIGN KEY (emp_id) REFERENCES employee(emp_id));
+
+
+CREATE TABLE Production_Log (
+    Log_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Emp_ID VARCHAR(5) NOT NULL,
+    Machine_ID VARCHAR(30) NOT NULL,
+    Component_ID INT NOT NULL,
+    Quantity INT NOT NULL,
+    Production_Date DATE NOT NULL,
+    FOREIGN KEY (Emp_ID) REFERENCES Employee(Emp_ID),
+    FOREIGN KEY (Machine_ID) REFERENCES Machine_Inventory(Machine_ID),
+    FOREIGN KEY (Component_ID) REFERENCES Comp_Inventory(Comp_ID)
+);
+
+
+CREATE TABLE Shift_Schedule (
+    Schedule_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Emp_ID VARCHAR(5) NOT NULL,
+    Shift_Date DATE NOT NULL,
+    Shift_Start TIME NOT NULL,
+    Shift_End TIME NOT NULL,
+    FOREIGN KEY (Emp_ID) REFERENCES Employee(Emp_ID)
+);
+
+
+CREATE TABLE Quality_Control_Log (
+    QC_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Component_ID INT NOT NULL,
+    Inspection_Date DATE NOT NULL,
+    Inspector_ID VARCHAR(5) NOT NULL,
+    Inspection_Result ENUM('Pass', 'Fail') NOT NULL,
+    FOREIGN KEY (Component_ID) REFERENCES Comp_Inventory(Comp_ID),
+    FOREIGN KEY (Inspector_ID) REFERENCES Employee(Emp_ID)
+);
+
+
+CREATE TABLE Supplier (
+    Supplier_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Supplier_Name VARCHAR(50) NOT NULL,
+    Component_ID INT NOT NULL,
+    Price DECIMAL(10, 2) NOT NULL,
+    Delivery_Time INT NOT NULL, -- in days
+    FOREIGN KEY (Component_ID) REFERENCES Comp_Inventory(Comp_ID)
+);
+
+
+CREATE TABLE IF NOT EXISTS Component_Order (
+    Order_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Component_ID INT NOT NULL,
+    Supplier_ID INT NOT NULL,
+    Quantity INT NOT NULL,
+    Order_Date DATE NOT NULL,
+    Delivery_Date DATE,
+    Status ENUM('Pending', 'In Progress', 'Completed') NOT NULL,
+    FOREIGN KEY (Component_ID) REFERENCES Comp_Inventory(c_no),
+    FOREIGN KEY (Supplier_ID) REFERENCES Supplier(Supplier_ID)
+);
+ CREATE TABLE IF NOT EXISTS Machine_Maintenance_Log (
+    Maintenance_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Machine_ID VARCHAR(30) NOT NULL,
+    Maintenance_Date DATE NOT NULL,
+    Description TEXT NOT NULL,
+    Cost DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (Machine_ID) REFERENCES MachineInventory(MachineId)
+);
+
+CREATE TABLE IF NOT EXISTS Employee_Leave (
+    Leave_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Emp_ID VARCHAR(5) NOT NULL,
+    Leave_Date DATE NOT NULL,
+    Reason TEXT,
+    Status ENUM('Pending', 'Approved', 'Rejected') NOT NULL,
+    FOREIGN KEY (Emp_ID) REFERENCES employee(emp_id)
+);
+
